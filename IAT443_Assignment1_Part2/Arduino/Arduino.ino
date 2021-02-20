@@ -1,6 +1,7 @@
 #include <Adafruit_CircuitPlayground.h>
 
-// the smooth class is from IAT 320 lecture by Mark Nazemi
+//-----------------Defined Classes
+// the smooth class is studied from IAT 320 lecture by Mark Nazemi
 class Smooth {
   private:
     float *window;
@@ -25,30 +26,37 @@ class Smooth {
     }
 };
 
+//-----------------Globals
+float xvel, smooth_xvel, yvel, smooth_yvel, zvel, smooth_zvel;  //accelerometer's x,y,z value
 
-float xvel, smooth_xvel, yvel, smooth_yvel, zvel, smooth_zvel;
+float brightness, smooth_brightness;  //light sensor
 
-float brightness, smooth_brightness;
-
-int leftbut, smooth_leftbut;
+int leftbut, smooth_leftbut; //left button / touch sensor
+int rigbut, smooth_rigbut; //right button
 
 //set up the smoothed value
 Smooth sx(10);
 Smooth sy(10);
 Smooth sz(10);
 
-Smooth sl(5); //smooth left-button
+Smooth sl(1); //smooth left-button
+Smooth sr(1); //smooth right-button
 Smooth sb(10); //smooth brightness
 
+//-----------------Set up
 void setup() {
   Serial.begin(9600);
   CircuitPlayground.begin();
 }
 
+//-----------------Loop
 void loop() {
   leftbut = CircuitPlayground.leftButton();
+  rigbut = CircuitPlayground.rightButton();
+
   brightness = CircuitPlayground.lightSensor();
-  
+
+  /*
   xvel = CircuitPlayground.motionX();
   yvel = CircuitPlayground.motionY();
   zvel = CircuitPlayground.motionZ();
@@ -56,20 +64,26 @@ void loop() {
   smooth_xvel = sx.update(xvel);
   smooth_yvel = sy.update(yvel);
   smooth_zvel = sz.update(zvel);
+  */
 
+  //smooth the sensor data using the smooth class
   smooth_leftbut = sl.update(leftbut);
+  smooth_rigbut = sr.update(rigbut);
   smooth_brightness = sb.update(brightness);
 
-  //Serial.print(smooth_leftbut);
-  //Serial.print(" ");
-  Serial.print(brightness);
+  //send sensor data to Processing
+  Serial.print(smooth_leftbut);
+  Serial.print(" ");
+  Serial.print(smooth_rigbut);
+  Serial.print(" "); 
+  Serial.println(brightness);
+  /*
   Serial.print(" ");
   Serial.print(smooth_xvel);
   Serial.print(" ");
   Serial.print(smooth_yvel);
   Serial.print(" ");
   Serial.println(smooth_zvel);
-
-  
+  */
   delay(100);
 }
